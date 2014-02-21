@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<QuestionForm xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2005-10-01/QuestionForm.xsd">
+  <Overview>
+    <FormattedContent><![CDATA[
+      <h1 align="center">Tag words based on image</h1>
+      <h2>Instructions</h2>
+      Your task is to tag <strong>up to three</strong> words that best describe the provided image.
+      <br/>Your goal is to select three words that come to mind when viewing an image.
+      <br/>
+      <h2>Task</h2>
+    ]]></FormattedContent>
+    <FormattedContent><![CDATA[
+    <img src="http://images.dailylife.com.au/2014/02/18/5175008/enhanced-buzz-wide-32746-1392314667-18.jpg?rand=1392679059978" alt="sample-bestimage-image1.jpg" />
+    ]]></FormattedContent>
+  </Overview>
+ <Question>
+    <QuestionIdentifier>Word1</QuestionIdentifier>
+    <IsRequired>true</IsRequired>
+    <QuestionContent>
+      <Text>Word 1:</Text>
+    </QuestionContent>
+    <AnswerSpecification>
+      <FreeTextAnswer>
+        <NumberOfLinesSuggestion>1</NumberOfLinesSuggestion>
+      </FreeTextAnswer>
+    </AnswerSpecification>
+  </Question>
+  <Question>
+    <QuestionIdentifier>Word2</QuestionIdentifier>
+    <QuestionContent>
+      <Text>Word 2 (optional):</Text>
+    </QuestionContent>
+    <AnswerSpecification>
+      <FreeTextAnswer>
+        <NumberOfLinesSuggestion>1</NumberOfLinesSuggestion>
+      </FreeTextAnswer>
+    </AnswerSpecification>
+  </Question>
+  <Question>
+    <QuestionIdentifier>Word3</QuestionIdentifier>
+    <QuestionContent>
+      <Text>Word 3 (optional):</Text>
+    </QuestionContent>
+    <AnswerSpecification>
+      <FreeTextAnswer>
+        <NumberOfLinesSuggestion>1</NumberOfLinesSuggestion>
+      </FreeTextAnswer>
+    </AnswerSpecification>
+  </Question>
+</QuestionForm>
