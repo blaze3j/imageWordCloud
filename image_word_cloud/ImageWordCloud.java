@@ -75,6 +75,25 @@ public class ImageWordCloud {
         return input;
     }
     
+    public String getMaxAssignments() {
+        String defaultAssignments = ""; //"5";
+        
+        if (0 < defaultAssignments.length())
+            return defaultAssignments;
+        
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("Enter max assignments:");
+        System.out.flush();
+        String input = "";
+        try {
+            input = br.readLine();
+        }
+        catch(IOException exception) {
+            System.err.println("Invalid input!");
+        }
+        return input;
+    }
+    
     public String overrideImagePath(String overview, String imagePath) {
         String changeMePath = "changemeintorealimagepath";
         
@@ -107,6 +126,11 @@ public class ImageWordCloud {
             //In this sample, the qualification is defined in the properties file.
             HITProperties props = new HITProperties(propertiesFile);
 
+            String assignments = this.getMaxAssignments();
+            System.out.println("Max assignments: " + assignments);
+
+            props.setMaxAssignments(assignments);
+            
             //Loading the question (QAP) file.  
             HITQuestion question = new HITQuestion(questionFile);
 
@@ -138,7 +162,6 @@ public class ImageWordCloud {
                 //The preview file has not been provided so the HIT will be loaded into Mechanical Turk.
             } else {
                 // System.out.println("props.getDescription(): " + question.getQuestion());
-                
                 // Create a HIT using the properties and question files
                 HIT hit = service.createHIT(null, // HITTypeId 
                         props.getTitle(), 
