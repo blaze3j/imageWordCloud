@@ -6,6 +6,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.io.PrintWriter;
+
+import com.amazonaws.mturk.addon.HITDataCSVReader;
+import com.amazonaws.mturk.addon.HITDataCSVWriter;
+import com.amazonaws.mturk.addon.HITDataInput;
+import com.amazonaws.mturk.addon.HITTypeResults;
 
 import com.amazonaws.mturk.addon.HITProperties;
 import com.amazonaws.mturk.addon.HITQuestion;
@@ -37,6 +43,8 @@ public class ImageWordCloud {
     private String rootDir = ".";
     private String questionFile = rootDir + "/image_word_cloud.question";
     private String propertiesFile = rootDir + "/image_word_cloud.properties";
+    private String successFile = rootDir + "/image_word_cloud.success";
+    private String resultsFile = rootDir + "/image_word_cloud.results";
 
     /**
      * Constructor
@@ -56,12 +64,51 @@ public class ImageWordCloud {
         return balance > 0;
     }
 
+    public void printHitResults(HIT hit) {
+        try {
+            System.out.println("hitid\thittypeid");
+            System.out.println(hit.getHITId() + "\t" + hit.getHITTypeId());
+
+            PrintWriter writer = new PrintWriter(successFile, "UTF-8");
+            writer.println("hitid\thittypeid");
+            writer.println(hit.getHITId() + "\t" + hit.getHITTypeId());
+            writer.close();
+        } catch (Exception e) {
+            System.err.println("ERROR: Could not print results: " + e.getLocalizedMessage());
+        }
+    }
+
+    public void printResults() {
+        try {
+            System.out.println("Using hit success file: " + successFile);
+            System.out.println("Storing results to file: " + resultsFile);
+
+            //Loads the .success file containing the HIT IDs and HIT Type IDs of HITs to be retrieved.
+            HITDataInput success = new HITDataCSVReader(successFile);
+
+            //Retrieves the submitted results of the specified HITs from Mechanical Turk
+            HITTypeResults results = service.getHITTypeResults(success);
+            results.setHITDataOutput(new HITDataCSVWriter(resultsFile));
+
+            //Writes the submitted results to the defined output file.
+            //The output file is a tab delimited file containing all relevant details
+            //of the HIT and assignments.  The submitted results are included as the last set of fields
+            //and are represented as tab separated question/answer pairs
+            results.writeResults();
+
+            System.out.println("Results have been written to: " + resultsFile);
+
+        } catch (Exception e) {
+            System.err.println("ERROR: Could not print results: " + e.getLocalizedMessage());
+        }
+    }
+
     public String getImagePath() {
         String defaultImagePath = ""; //"http://images.dailylife.com.au/2014/02/18/5175008/enhanced-buzz-wide-32746-1392314667-18.jpg?rand=1392679059978";
-        
+
         if (0 < defaultImagePath.length())
             return defaultImagePath;
-        
+
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Enter image path:");
         System.out.flush();
@@ -74,13 +121,13 @@ public class ImageWordCloud {
         }
         return input;
     }
-    
+
     public String getMaxAssignments() {
-        String defaultAssignments = ""; //"5";
-        
+        String defaultAssignments = ""; // "5";
+
         if (0 < defaultAssignments.length())
             return defaultAssignments;
-        
+
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Enter max assignments:");
         System.out.flush();
@@ -93,10 +140,10 @@ public class ImageWordCloud {
         }
         return input;
     }
-    
+
     public String overrideImagePath(String overview, String imagePath) {
         String changeMePath = "changemeintorealimagepath";
-        
+
         Pattern p = Pattern.compile(changeMePath);
         Matcher m = p.matcher(overview);
         StringBuffer sb = new StringBuffer();
@@ -108,7 +155,7 @@ public class ImageWordCloud {
         m.appendTail(sb);
 
         overview = sb.toString();
-        
+
         return overview;
     }
 
@@ -130,7 +177,7 @@ public class ImageWordCloud {
             System.out.println("Max assignments: " + assignments);
 
             props.setMaxAssignments(assignments);
-            
+
             //Loading the question (QAP) file.  
             HITQuestion question = new HITQuestion(questionFile);
 
@@ -181,6 +228,8 @@ public class ImageWordCloud {
 
                 System.out.println(service.getWebsiteURL() 
                         + "/mturk/preview?groupId=" + hit.getHITTypeId());
+
+                this.printHitResults(hit);
             }
         } catch (ValidationException e) {
             //The validation exceptions will provide good insight into where in the QAP has errors.  
@@ -200,10 +249,22 @@ public class ImageWordCloud {
 
         ImageWordCloud app = new ImageWordCloud();
 
-        if (args.length == 1 && !args[0].equals("")) {
-            app.createImageWordCloud(args[0]);
-        } else if (app.hasEnoughFund()) {
-            app.createImageWordCloud(null);
+        if (0 == args.length) {
+
+        }
+        else if (args[0].equals("create")) {
+            //            if (args.length == 1 && !args[0].equals("")) {
+            //                app.createImageWordCloud(args[0]);
+            //            } else if (app.hasEnoughFund()) {
+            //                app.createImageWordCloud(null);
+            //            }
+            if (app.hasEnoughFund()) {
+                app.createImageWordCloud(null);
+            }     
+        }
+        else if (args[0].equals("results")) {
+            System.out.println("Getting results");
+            app.printResults();
         }
     }
 }
