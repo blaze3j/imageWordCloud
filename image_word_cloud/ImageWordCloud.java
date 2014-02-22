@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.io.PrintWriter;
@@ -46,7 +47,7 @@ public class ImageWordCloud {
      *
      */
     public ImageWordCloud() {
-        service = new RequesterService(new PropertiesClientConfig("../mturk.properties"));
+        service = new RequesterService(new PropertiesClientConfig("./mturk.properties"));
     }
 
     /**
@@ -243,11 +244,21 @@ public class ImageWordCloud {
     public static final String successFile = rootDir + "/image_word_cloud.success";
     public static final String resultsFile = rootDir + "/image_word_cloud.results";
     public static final String uniqueWordsFile = rootDir + "/image_word_cloud.unique";
+    
+    /*
+     * 
+     */
+    public void createWordle(ArrayList<String> words){
+    	
+    	
+    }
 
     /**
      * @param args
+     * @throws ValidationException 
+     * @throws IOException 
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, ValidationException {
 
         if (0 == args.length) {
 
@@ -265,7 +276,8 @@ public class ImageWordCloud {
             }     
         }
         else if (args[0].equals("results")) {
-            System.out.println("Getting results");
+            System.out.println(
+            		"Getting results");
             
             ImageWordCloud app = new ImageWordCloud();
             
@@ -283,8 +295,36 @@ public class ImageWordCloud {
                 System.out.println(ex.getMessage());
                 ex.printStackTrace();
             }// catch(Exception ex)
-
         }
-
+        else if(args[0].equals("filter")){
+        	System.out.println(
+            		"Creating Filter HITs");
+            
+            FilterWordCloud app = new FilterWordCloud();
+            
+            //the word generation code below is temporary until we can get the word list from a txt file on
+            //disk
+            ArrayList<String> words = new ArrayList<String>();
+            
+            
+            
+            for(int i = 0; i< 25; i++)
+            	words.add(String.format("word_%d", i));
+            
+            app.createFilterHit(false, words);
+        }
+        else if (args[0].equals("wordle")){
+        	
+        	//again I am making up a list of bogus words, real ones will
+        	//come from the unique file
+        	ArrayList<String> words = new ArrayList<String>();
+        	
+        	for(int i = 0; i< 25; i++)
+            	words.add(String.format("word_%d", i));
+        	
+        	WordleBuilder builder = new WordleBuilder();
+        	builder.createWordCloud(words);
+        	
+        }
     }
 }
