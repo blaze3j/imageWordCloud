@@ -2,6 +2,8 @@ package image_word_cloud;
 
 import java.io.File;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -244,15 +246,8 @@ public class ImageWordCloud {
     public static final String successFile = rootDir + "/image_word_cloud.success";
     public static final String resultsFile = rootDir + "/image_word_cloud.results";
     public static final String uniqueWordsFile = rootDir + "/image_word_cloud.unique";
+    public static final String filteredWordsFile = rootDir + "/image_word_cloud.filtered";
     
-    /*
-     * 
-     */
-    public void createWordle(ArrayList<String> words){
-    	
-    	
-    }
-
     /**
      * @param args
      * @throws ValidationException 
@@ -261,70 +256,28 @@ public class ImageWordCloud {
     public static void main(String[] args) throws IOException, ValidationException {
 
         if (0 == args.length) {
+        	
+        	WordCloudHelper.createImageWordHit();
+        	WordCloudHelper.createAndPrintImageWordResults();
+        	WordCloudHelper.createUniqueWordsOutputResults();
+        	WordCloudHelper.createFilterHits();
+        	WordCloudHelper.createWordle();
 
         }
         else if (args[0].equals("create")) {
-            //            if (args.length == 1 && !args[0].equals("")) {
-            //                app.createImageWordCloud(args[0]);
-            //            } else if (app.hasEnoughFund()) {
-            //                app.createImageWordCloud(null);
-            //            }
-            ImageWordCloud app = new ImageWordCloud();
-
-            if (app.hasEnoughFund()) {
-                app.createImageWordCloud(null);
-            }     
+        	WordCloudHelper.createImageWordHit();
         }
         else if (args[0].equals("results")) {
-            System.out.println(
-            		"Getting results");
-            
-            ImageWordCloud app = new ImageWordCloud();
-            
-            app.printResults();
+        	WordCloudHelper.createAndPrintImageWordResults();
         }
         else if (args[0].equals("unique")) {
-            System.out.println("Process results to unique words");
-            
-            ProcessIDeasHITs proc = new ProcessIDeasHITs(resultsFile, uniqueWordsFile);
-            try{
-                proc.process_file();
-            }
-            catch (Exception ex) 
-            {
-                System.out.println(ex.getMessage());
-                ex.printStackTrace();
-            }// catch(Exception ex)
+        	WordCloudHelper.createUniqueWordsOutputResults();
         }
         else if(args[0].equals("filter")){
-        	System.out.println(
-            		"Creating Filter HITs");
-            
-            FilterWordCloud app = new FilterWordCloud();
-            
-            //the word generation code below is temporary until we can get the word list from a txt file on
-            //disk
-            ArrayList<String> words = new ArrayList<String>();
-            
-            
-            
-            for(int i = 0; i< 25; i++)
-            	words.add(String.format("word_%d", i));
-            
-            app.createFilterHit(false, words);
+        	WordCloudHelper.createFilterHits();
         }
         else if (args[0].equals("wordle")){
-        	
-        	//again I am making up a list of bogus words, real ones will
-        	//come from the unique file
-        	ArrayList<String> words = new ArrayList<String>();
-        	
-        	for(int i = 0; i< 25; i++)
-            	words.add(String.format("word_%d", i));
-        	
-        	WordleBuilder builder = new WordleBuilder();
-        	builder.createWordCloud(words);
-        	
+        	WordCloudHelper.createWordle();
         }
     }
 }
