@@ -98,8 +98,8 @@ public class FilterWordCloud {
 			
 			ArrayList<String> questionWords = new ArrayList<String>();
 			
-			for(int j=0; j<4 && (i+j< words.size()) ; j++)
-				questionWords.add(words.get(i+j));
+			for(int j=0; j<4 && (i*4 + j< words.size()) ; j++)
+				questionWords.add(words.get(i*4 + j));
 			
 			HITQuestion question = new HITQuestion();		
 			
