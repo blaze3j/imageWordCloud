@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<QuestionForm xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2005-10-01/QuestionForm.xsd">
+  <Overview>
+    <FormattedContent><![CDATA[
+      <h1 align="center">Check offensive words based on image</h1>
+      <h2>Instructions</h2>
+      Your task is to check words you believe are <strong>offensive</strong> for the provided image.
+      <br/>
+      <br/>
+      <h2>Task</h2>
+    ]]></FormattedContent>
+    <FormattedContent><![CDATA[
+    <img src="changemeintorealimagepath" alt="provocative image" />
+    ]]></FormattedContent>
+  </Overview>
+ <Question>
+    <QuestionIdentifier>1</QuestionIdentifier>
+    <QuestionContent>
+      <Text>Please check words with are either offensive or NOT related to the image</Text>
+    </QuestionContent>
+    <AnswerSpecification>
+      <SelectionAnswer>
+        <MinSelectionCount>1</MinSelectionCount>
+        <MaxSelectionCount>4</MaxSelectionCount>
+        <StyleSuggestion>checkbox</StyleSuggestion>
+        <Selections>
+          <Selection>
+            <SelectionIdentifier>different</SelectionIdentifier>
+            <Text>different</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>word_1</SelectionIdentifier>
+            <Text>word_1</Text>
+          </Selection>
+		  <Selection>
+            <SelectionIdentifier>word_2</SelectionIdentifier>
+            <Text>word_2</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>word_3</SelectionIdentifier>
+            <Text>word_3</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>word_4</SelectionIdentifier>
+            <Text>word_4</Text>
+          </Selection>
+        </Selections>
+      </SelectionAnswer>
+    </AnswerSpecification>
+  </Question>
+</QuestionForm>
