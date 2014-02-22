@@ -40,12 +40,7 @@ public class ImageWordCloud {
     private RequesterService service;
 
     // Defining the location of the file containing the QAP and the properties of the HIT
-    private String rootDir = ".";
-    private String questionFile = rootDir + "/image_word_cloud.question";
-    private String propertiesFile = rootDir + "/image_word_cloud.properties";
-    private String successFile = rootDir + "/image_word_cloud.success";
-    private String resultsFile = rootDir + "/image_word_cloud.results";
-
+    
     /**
      * Constructor
      *
@@ -88,7 +83,7 @@ public class ImageWordCloud {
 
             //Retrieves the submitted results of the specified HITs from Mechanical Turk
             HITTypeResults results = service.getHITTypeResults(success);
-            results.setHITDataOutput(new HITDataCSVWriter(resultsFile));
+            results.setHITDataOutput(new HITDataCSVWriter(resultsFile, ',', false));
 
             //Writes the submitted results to the defined output file.
             //The output file is a tab delimited file containing all relevant details
@@ -241,13 +236,18 @@ public class ImageWordCloud {
             System.err.println(e.getLocalizedMessage());
         }
     }
+    
+    public static final String rootDir = ".";
+    public static final String questionFile = rootDir + "/image_word_cloud.question";
+    public static final String propertiesFile = rootDir + "/image_word_cloud.properties";
+    public static final String successFile = rootDir + "/image_word_cloud.success";
+    public static final String resultsFile = rootDir + "/image_word_cloud.results";
+    public static final String uniqueWordsFile = rootDir + "/image_word_cloud.unique";
 
     /**
      * @param args
      */
     public static void main(String[] args) {
-
-        ImageWordCloud app = new ImageWordCloud();
 
         if (0 == args.length) {
 
@@ -258,13 +258,33 @@ public class ImageWordCloud {
             //            } else if (app.hasEnoughFund()) {
             //                app.createImageWordCloud(null);
             //            }
+            ImageWordCloud app = new ImageWordCloud();
+
             if (app.hasEnoughFund()) {
                 app.createImageWordCloud(null);
             }     
         }
         else if (args[0].equals("results")) {
             System.out.println("Getting results");
+            
+            ImageWordCloud app = new ImageWordCloud();
+            
             app.printResults();
         }
+        else if (args[0].equals("unique")) {
+            System.out.println("Process results to unique words");
+            
+            ProcessIDeasHITs proc = new ProcessIDeasHITs(resultsFile, uniqueWordsFile);
+            try{
+                proc.process_file();
+            }
+            catch (Exception ex) 
+            {
+                System.out.println(ex.getMessage());
+                ex.printStackTrace();
+            }// catch(Exception ex)
+
+        }
+
     }
 }
