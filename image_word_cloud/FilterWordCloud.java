@@ -2,12 +2,17 @@ package image_word_cloud;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import com.amazonaws.mturk.service.axis.RequesterService;
 
+import com.amazonaws.mturk.addon.HITDataCSVReader;
+import com.amazonaws.mturk.addon.HITDataCSVWriter;
+import com.amazonaws.mturk.addon.HITDataInput;
 import com.amazonaws.mturk.addon.HITProperties;
 import com.amazonaws.mturk.addon.HITQuestion;
+import com.amazonaws.mturk.addon.HITTypeResults;
 import com.amazonaws.mturk.addon.QAPValidator;
 import com.amazonaws.mturk.requester.HIT;
 import com.amazonaws.mturk.service.exception.ValidationException;
@@ -18,6 +23,8 @@ public class FilterWordCloud {
 	private RequesterService service;
 	private String propertiesFile = "filter_word_cloud.properties";
 	private String rootDir = ".";
+	private String successFile = "filter_word_cloud.success";
+	private String resultsFile = "filter_word_cloud.results";
 	
 	public FilterWordCloud(){
 		service = new RequesterService(new PropertiesClientConfig("./mturk.properties"));
@@ -84,6 +91,48 @@ public class FilterWordCloud {
     	return question.toString();
     	
     }
+    
+    public void saveHITInfo(ArrayList<HIT> hits) {
+        try {
+            //System.out.println("hitid\thittypeid");
+            //System.out.println(hit.getHITId() + "\t" + hit.getHITTypeId());
+
+            PrintWriter writer = new PrintWriter(successFile, "UTF-8");
+            writer.println("hitid\thittypeid");
+            for(HIT hit: hits){     	
+            	writer.println(hit.getHITId() + "\t" + hit.getHITTypeId());
+            }
+            writer.close();
+            
+        } catch (Exception e) {
+            System.err.println("ERROR: Could not print results: " + e.getLocalizedMessage());
+        }
+    }
+    
+    public void printFilteredResults() {
+        try {
+            System.out.println("Using hit success file: " + successFile);
+            System.out.println("Storing results to file: " + resultsFile);
+
+            //Loads the .success file containing the HIT IDs and HIT Type IDs of HITs to be retrieved.
+            HITDataInput success = new HITDataCSVReader(successFile);
+
+            //Retrieves the submitted results of the specified HITs from Mechanical Turk
+            HITTypeResults results = service.getHITTypeResults(success);
+            results.setHITDataOutput(new HITDataCSVWriter(resultsFile, ',', false));
+
+            //Writes the submitted results to the defined output file.
+            //The output file is a tab delimited file containing all relevant details
+            //of the HIT and assignments.  The submitted results are included as the last set of fields
+            //and are represented as tab separated question/answer pairs
+            results.writeResults();
+
+            System.out.println("Results have been written to: " + resultsFile);
+
+        } catch (Exception e) {
+            System.err.println("ERROR: Could not print results: " + e.getLocalizedMessage());
+        }
+    }
 	
     /*
      * Creates as many distinct HITs as necessary to filter words
@@ -94,12 +143,14 @@ public class FilterWordCloud {
 		int num_words = words.size();
 		int num_hits = num_words / 4;
 		
+		ArrayList<HIT> hits = new ArrayList<HIT>();
+		
 		for(int i=0; i < num_hits; i++ ){
 			
 			ArrayList<String> questionWords = new ArrayList<String>();
 			
-			for(int j=0; j<4 && (i+j< words.size()) ; j++)
-				questionWords.add(words.get(i+j));
+			for(int j=0; j<4 && (i*4 + j< words.size()) ; j++)
+				questionWords.add(words.get(i*4 + j));
 			
 			HITQuestion question = new HITQuestion();		
 			
@@ -147,7 +198,13 @@ public class FilterWordCloud {
 	
 	            System.out.println(service.getWebsiteURL() 
 	                    + "/mturk/preview?groupId=" + hit.getHITTypeId());
+	            
+	            hits.add(hit);
+	            
+	            
 			}
 		}
+		
+		saveHITInfo(hits);
 	}
 }
