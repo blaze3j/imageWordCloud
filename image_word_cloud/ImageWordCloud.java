@@ -279,5 +279,10 @@ public class ImageWordCloud {
         else if (args[0].equals("wordle")){
         	WordCloudHelper.createWordle();
         }
+        else if (args[0].equals("fresults")){
+        	
+        	FilterWordCloud app = new FilterWordCloud();
+        	app.printFilteredResults();
+        }
     }
 }
