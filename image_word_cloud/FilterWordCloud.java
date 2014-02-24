@@ -20,11 +20,12 @@ import com.amazonaws.mturk.util.PropertiesClientConfig;
 
 public class FilterWordCloud {
 	
+	public static String resultsFile = "filter_word_cloud.results";
+	
 	private RequesterService service;
 	private String propertiesFile = "filter_word_cloud.properties";
 	private String rootDir = ".";
 	private String successFile = "filter_word_cloud.success";
-	private String resultsFile = "filter_word_cloud.results";
 	
 	public FilterWordCloud(){
 		service = new RequesterService(new PropertiesClientConfig("./mturk.properties"));
@@ -199,9 +200,7 @@ public class FilterWordCloud {
 	            System.out.println(service.getWebsiteURL() 
 	                    + "/mturk/preview?groupId=" + hit.getHITTypeId());
 	            
-	            hits.add(hit);
-	            
-	            
+	            hits.add(hit);           
 			}
 		}
 		
