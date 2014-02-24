@@ -7,6 +7,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import com.amazonaws.mturk.requester.Assignment;
+import com.amazonaws.mturk.requester.AssignmentStatus;
+import com.amazonaws.mturk.requester.HIT;
+import com.amazonaws.mturk.service.axis.RequesterService;
 import com.amazonaws.mturk.service.exception.ValidationException;
 
 public class WordCloudHelper {
@@ -126,6 +130,41 @@ public class WordCloudHelper {
         ArrayList<String> words = getUniqueWords();     
         
         app.createFilterHit(false, words);
+    }
+    
+    /**
+     * 
+     */
+    public static void createAndPrintFilterHitsResults(){
+    	FilterWordCloud app = new FilterWordCloud();
+    	app.printFilteredResults();
+    }
+    
+    
+    /**
+     * Verify that all assignments are submitted or completed
+     * @param hitIds
+     * @param numAssignmentsPerHit
+     * @param service
+     * @return
+     */
+    public static boolean hitsCompleted(ArrayList<String> hitIds, RequesterService service){
+    	
+    	boolean completed = true;
+    	
+    	for(String hitId: hitIds){
+    		
+        	Assignment[] hitAssignments = service.getAllAssignmentsForHIT(hitId);
+        	
+        	HIT hit = service.getHIT(hitId);
+        	
+        	if (hit == null || hit.getMaxAssignments() != hitAssignments.length){
+        		completed = false;
+        		break;
+        	}
+        } 
+    	
+    	return completed; 
     }
     
     /**

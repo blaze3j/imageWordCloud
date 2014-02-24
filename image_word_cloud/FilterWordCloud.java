@@ -1,6 +1,8 @@
 package image_word_cloud;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -14,6 +16,8 @@ import com.amazonaws.mturk.addon.HITProperties;
 import com.amazonaws.mturk.addon.HITQuestion;
 import com.amazonaws.mturk.addon.HITTypeResults;
 import com.amazonaws.mturk.addon.QAPValidator;
+import com.amazonaws.mturk.requester.Assignment;
+import com.amazonaws.mturk.requester.AssignmentStatus;
 import com.amazonaws.mturk.requester.HIT;
 import com.amazonaws.mturk.service.exception.ValidationException;
 import com.amazonaws.mturk.util.PropertiesClientConfig;
@@ -110,11 +114,38 @@ public class FilterWordCloud {
         }
     }
     
+    /**
+     * Prints filtered results
+     */
     public void printFilteredResults() {
         try {
+        	
+            boolean completed = false;
+            
+            //retrieve all Hits and check completion status of assignments
+            BufferedReader reader = new  BufferedReader(new FileReader(successFile));
+            String line;
+            
+            ArrayList<String> hitIds = new ArrayList<String>();
+            reader.readLine();
+
+            while((line = reader.readLine())!= null){	
+            	hitIds.add(line.split("\t")[0]);
+            }
+            
+            reader.close();
+            
+            while(!completed){
+
+	            completed = WordCloudHelper.hitsCompleted(hitIds, service);
+	            
+	            if (!completed)
+	            	Thread.sleep(1000 * 60 * 10); //sleep for 10 minutes and check again until completion
+            }
+            
             System.out.println("Using hit success file: " + successFile);
             System.out.println("Storing results to file: " + resultsFile);
-
+            
             //Loads the .success file containing the HIT IDs and HIT Type IDs of HITs to be retrieved.
             HITDataInput success = new HITDataCSVReader(successFile);
 
@@ -127,7 +158,7 @@ public class FilterWordCloud {
             //of the HIT and assignments.  The submitted results are included as the last set of fields
             //and are represented as tab separated question/answer pairs
             results.writeResults();
-
+            
             System.out.println("Results have been written to: " + resultsFile);
 
         } catch (Exception e) {
