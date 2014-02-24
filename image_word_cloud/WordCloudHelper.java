@@ -37,16 +37,32 @@ public class WordCloudHelper {
      * @return a list of words considered valid
      * @throws IOException 
      */
-    public static ArrayList<String> getFilteredWords() throws IOException{
+    public static ArrayList<String> getWordsForWordle() throws IOException{
+
+    	FilterOffensiveIDeasHITs proc = new FilterOffensiveIDeasHITs(FilterWordCloud.resultsFile, 
+    																 ImageWordCloud.filteredWordsFile, 
+    																 ImageWordCloud.uniqueWordsFile);
     	
-    	HashSet<String> filteredWords = new HashSet<String>(getUniqueWords());
-    	 
-    	//TODO: get all HIT results for word filtering.
-    	HashSet<String> flaggedWords = new HashSet<String>();
+    	proc.filter_file();
     	
-    	filteredWords.removeAll(flaggedWords);
+    	ArrayList<String> words =  new ArrayList<String>();
+    	FileInputStream fStream = new FileInputStream(ImageWordCloud.filteredWordsFile);
+    	BufferedReader reader = new BufferedReader(new InputStreamReader(fStream));
+    	String line;
     	
-    	return  new ArrayList<String>();
+    	while((line = reader.readLine()) != null){
+    		
+    		String[] fragments = line.split(",");
+    		String word = fragments[0].trim();
+    		
+    		for(int i=0; i< Integer.parseInt(fragments[1]); i++){			
+    			words.add(word);
+    		}
+    	}
+    	
+    	reader.close();
+    	
+    	return words;
     }
     
     /**
@@ -118,7 +134,7 @@ public class WordCloudHelper {
      */
     public static void createWordle() throws IOException{
     	
-    	ArrayList<String> words = getFilteredWords();
+    	ArrayList<String> words = getWordsForWordle();
     	
     	WordleBuilder builder = new WordleBuilder();
     	builder.createWordCloud(words);
