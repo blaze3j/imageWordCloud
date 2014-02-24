@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -78,6 +79,30 @@ public class ImageWordCloud {
 
     public void printResults() {
         try {
+
+        	boolean completed = false;
+        	
+            //retrieve all Hits and check completion status of assignments
+            BufferedReader reader = new  BufferedReader(new FileReader(successFile));
+            String line;
+            
+            ArrayList<String> hitIds = new ArrayList<String>();
+            reader.readLine();
+
+            while((line = reader.readLine())!= null){	
+            	hitIds.add(line.split("\t")[0]);
+            }
+            
+            reader.close();
+            
+            while(!completed){
+
+	            completed = WordCloudHelper.hitsCompleted(hitIds, service);
+	            
+	            if (!completed)
+	            	Thread.sleep(1000 * 60 * 10); //sleep for 10 minutes and check again until completion
+            }
+            
             System.out.println("Using hit success file: " + successFile);
             System.out.println("Storing results to file: " + resultsFile);
 
@@ -256,13 +281,12 @@ public class ImageWordCloud {
     public static void main(String[] args) throws IOException, ValidationException {
 
         if (0 == args.length) {
-        	
         	WordCloudHelper.createImageWordHit();
         	WordCloudHelper.createAndPrintImageWordResults();
         	WordCloudHelper.createUniqueWordsOutputResults();
         	WordCloudHelper.createFilterHits();
+        	WordCloudHelper.createAndPrintFilterHitsResults();
         	WordCloudHelper.createWordle();
-
         }
         else if (args[0].equals("create")) {
         	WordCloudHelper.createImageWordHit();
@@ -280,9 +304,7 @@ public class ImageWordCloud {
         	WordCloudHelper.createWordle();
         }
         else if (args[0].equals("fresults")){
-        	
-        	FilterWordCloud app = new FilterWordCloud();
-        	app.printFilteredResults();
+        	WordCloudHelper.createAndPrintFilterHitsResults();
         }
     }
 }
